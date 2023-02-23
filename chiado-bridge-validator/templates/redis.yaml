@@ -1,0 +1,71 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+  # namespace: bridge-validator
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  # storageClassName: 
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  # namespace: bridge-validator
+  labels:
+    app: redis
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-pvc
+      containers:
+      - name: redis
+        image: redis:4
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+        ports:
+        - name: client
+          containerPort: 6379
+          protocol: TCP
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - 'redis-cli -h redis.bridge-validator.svc.cluster.local ping'
+          initialDelaySeconds: 20
+          periodSeconds: 3
+        command: [redis-server, --appendonly, 'yes']
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  # namespace: bridge-validator
+spec:
+  selector:
+    app: redis
+  ports:
+  - name: client
+    port: 6379
+    protocol: TCP
+    targetPort: 6379
+

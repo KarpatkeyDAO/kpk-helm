@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: bridge-affirmation
+  name: bridge-affirmation
+  # namespace: bridge-validator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bridge-affirmation
+  template:
+    metadata:
+      labels:
+        app: bridge-affirmation
+    spec:
+      containers:
+      - image: poanetwork/tokenbridge-oracle:latest
+        imagePullPolicy: Always
+        name: bridge-affirmation
+        
+        args: [
+            "yarn",
+            "watcher:affirmation-request",
+          ]
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        
+        env:
+        {{- include "custom_environment" . | nindent 10 }}
+
+        # env: 
+        # - name: NODE_ENV
+        #   value: production
+
+        # - name: ORACLE_BRIDGE_MODE
+        #   value: "ERC_TO_NATIVE"
+        
+        # - name: ORACLE_LOG_LEVEL
+        #   value: debug
+
+        # - name: COMMON_HOME_RPC_URL
+        #   value: "https://rpc.chiadochain.net/"
+        
+        # - name: COMMON_HOME_BRIDGE_ADDRESS
+        #   value: "0x1558B3D83D56bDF55Db1E9410AAdBD2F79057228"
+        
+        # - name: ORACLE_HOME_RPC_POLLING_INTERVAL
+        #   value: "5000"
+
+        # - name: COMMON_FOREIGN_RPC_URL
+        #   value: "https://goerli.infura.io/v3/6335310506a24760987493a2cc5e0b64"
+        
+        # - name: COMMON_FOREIGN_BRIDGE_ADDRESS
+        #   value: "0x71cf72bdc6b3f77a12c7521e34c711c7dec0c336"
+        
+        # - name: ORACLE_FOREIGN_RPC_POLLING_INTERVAL
+        #   value: "5000"
+
+        # - name: ORACLE_TX_REDUNDANCY
+        #   value: "true"
+        
+        # - name: ORACLE_HOME_TX_RESEND_INTERVAL
+        #   value: "300000"
+          
+        # - name: COMMON_HOME_GAS_PRICE_SUPPLIER_URL
+        #   value: "eip1559-gas-estimation"
+        
+        # - name: COMMON_HOME_GAS_PRICE_SPEED_TYPE
+        #   value: "fast"
+        
+        # - name: COMMON_HOME_GAS_PRICE_FALLBACK
+        #   value: "1000000000"
+        
+        # - name: COMMON_HOME_GAS_PRICE_FACTOR
+        #   value: "1"
+        
+        # - name: ORACLE_HOME_GAS_PRICE_UPDATE_INTERVAL
+        #   value: "600000"
+
+        # - name: COMMON_FOREIGN_GAS_PRICE_FALLBACK
+        #   value: "10000000000"
+        
+        # - name: COMMON_FOREIGN_GAS_PRICE_FACTOR
+        #   value: "1"
+        
+        # - name: ORACLE_FOREIGN_GAS_PRICE_UPDATE_INTERVAL
+        #   value: "600000"
+
+        # - name: ORACLE_ALLOW_HTTP_FOR_RPC
+        #   value: "false"
+
+          
+        # - name: ORACLE_QUEUE_URL
+        #   value: "amqp://rabbitmq-client:5672"
+        # - name: ORACLE_REDIS_URL
+        #   value: "redis:6379"
+
+        #   ## BEGIN Calculated by scripts/getValidatorStartBlocks.js
+        # - name: ORACLE_HOME_START_BLOCK
+        #   value: "1022644" #181500
+        # - name: ORACLE_FOREIGN_START_BLOCK
+        #   value: "8011324" #7628230
+        #   ## END Calculated by scripts/getValidatorStartBlocks.js
+
+        
+
+      restartPolicy: Always
+      
+  
