@@ -4,5 +4,14 @@
 
 
 
-You can specify the envs for xdai/amb in values.yaml/override.yaml
+Steps:
 
+- 1: git clone https://github.com/KarpatkeyDAO/kpk-helm
+
+- 2: copy the values.yaml to override.yaml and paste the env values into that
+
+- 3: kubectl create ns bridge-validator
+
+- 4: helm install -n bridge-validator chiado ./chiado-bridge-validator/ -f override.yaml
+
+- 5: check the pod logs!
